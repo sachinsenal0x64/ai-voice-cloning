@@ -1088,36 +1088,6 @@ def prepare_dataset(files, outdir, language=None, progress=None):
             with open(f'{outdir}/train.txt', 'a', encoding="utf-8") as f:
                 f.write(f'{line}\n')
 
-    '''for file in enumerate_progress(files, desc="Iterating through voice files", progress=progress):
-        basename = os.path.basename(file)
-        result = whisper_transcribe(file, language=language)
-        results[basename] = result
-        print(f"Transcribed file: {file}, {len(result['segments'])} found.")
-
-        waveform, sampling_rate = torchaudio.load(file)
-        num_channels, num_frames = waveform.shape
-
-        idx = 0
-        for segment in result[
-            'segments']:  # enumerate_progress(result['segments'], desc="Segmenting voice file", progress=progress):
-            start = int(segment['start'] * sampling_rate)
-            end = int(segment['end'] * sampling_rate)
-
-            sliced_waveform = waveform[:, start:end]
-            sliced_name = basename.replace(".wav", f"_{pad(idx, 4)}.wav")
-
-            if not torch.any(sliced_waveform < 0):
-                print(f"Error with {sliced_name}, skipping...")
-                continue
-
-            torchaudio.save(f"{outdir}/{sliced_name}", sliced_waveform, sampling_rate)
-
-            idx = idx + 1
-            line = f"{sliced_name}|{segment['text'].strip()}"
-            transcription.append(line)
-            with open(f'{outdir}/train.txt', 'a', encoding="utf-8") as f:
-                f.write(f'{line}\n')
-    '''
     with open(f'{outdir}/whisper.json', 'w', encoding="utf-8") as f:
         f.write(json.dumps(results, indent='\t'))
 
