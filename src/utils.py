@@ -1052,6 +1052,7 @@ def whisper_transcribe( file, language=None ):
 	elif args.whisper_backend == "m-bain/whisperx":
 		import whisperx
 		device = "cuda" if get_device_name() == "cuda" else "cpu"
+		if args.whisper_force_cpu:	device = "cpu"
 		result = whisper_model.transcribe(file)
 		model_a, metadata = whisperx.load_align_model(language_code=result["language"], device=device)
 		result_aligned = whisperx.align(result["segments"], model_a, metadata, file, device)
@@ -1645,6 +1646,7 @@ def setup_args():
 		
 		'autoregressive-model': None,
 		'whisper-backend': 'openai/whisper',
+		'whisper-force-cpu': False,
 		'whisper-model': "base",
 
 		'training-default-halfp': False,
@@ -1684,6 +1686,7 @@ def setup_args():
 	
 	parser.add_argument("--autoregressive-model", default=default_arguments['autoregressive-model'], help="Specifies which autoregressive model to use for sampling.")
 	parser.add_argument("--whisper-backend", default=default_arguments['whisper-backend'], action='store_true', help="Picks which whisper backend to use (openai/whisper, lightmare/whispercpp, m-bain/whisperx)")
+	parser.add_argument("--whisper-force-cpu", default=default_arguments['whisper-force-cpu'], action='store_true', help="Force whisper to cpu. Currently whisperx only.")
 	parser.add_argument("--whisper-model", default=default_arguments['whisper-model'], help="Specifies which whisper model to use for transcription.")
 	
 	parser.add_argument("--training-default-halfp", action='store_true', default=default_arguments['training-default-halfp'], help="Training default: halfp")
@@ -1747,6 +1750,8 @@ def update_args( **kwargs ):
 	args.vocoder_model = settings['vocoder_model']
 	args.whisper_backend = settings['whisper_backend']
 	args.whisper_model = settings['whisper_model']
+	args.whisper_force_cpu = settings['whisper_force_cpu']
+
 
 	args.training_default_halfp = settings['training_default_halfp']
 	args.training_default_bnb = settings['training_default_bnb']
@@ -1778,6 +1783,7 @@ def save_args_settings():
 		'autoregressive-model': args.autoregressive_model,
 		'vocoder-model': args.vocoder_model,
 		'whisper-backend': args.whisper_backend,
+		'whisper-force-cpu': args.whisper_force_cpu,
 		'whisper-model': args.whisper_model,
 
 		'training-default-halfp': args.training_default_halfp,
@@ -2072,6 +2078,9 @@ def load_whisper_model(language=None, model_name=None, progress=None):
 	elif args.whisper_backend == "m-bain/whisperx":
 		import whisperx
 		device = "cuda" if get_device_name() == "cuda" else "cpu"
+		if args.whisper_force_cpu:
+			device = "cpu"
+		print(f"Running WhisperX using {device}")
 		whisper_model = whisperx.load_model(model_name, device)
 
 	print("Loaded Whisper model")

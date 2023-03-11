@@ -534,6 +534,7 @@ def setup_gradio():
 					
 					EXEC_SETTINGS['vocoder_model'] = gr.Dropdown(VOCODERS, label="Vocoder", value=args.vocoder_model if args.vocoder_model else VOCODERS[-1])
 					EXEC_SETTINGS['whisper_backend'] = gr.Dropdown(WHISPER_BACKENDS, label="Whisper Backends", value=args.whisper_backend)
+					EXEC_SETTINGS['whisper_force_cpu'] = gr.Checkbox(label="Use CPU for WhisperX", value=args.whisper_force_cpu)
 					EXEC_SETTINGS['whisper_model'] = gr.Dropdown(WHISPER_MODELS, label="Whisper Model", value=args.whisper_model)
 					
 					EXEC_SETTINGS['training_default_halfp'] = TRAINING_SETTINGS['half_p']
