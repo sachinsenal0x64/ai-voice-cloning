@@ -493,7 +493,11 @@ def setup_gradio():
 				with gr.Row():
 					with gr.Column():
 						training_list = get_training_list()
-						training_configs = gr.Dropdown(label="Training Configuration", choices=training_list, value=training_list[0])
+						if len(training_list) > 0:
+							training_val =  training_list[0]
+						else:
+							training_val = ""
+						training_configs = gr.Dropdown(label="Training Configuration", choices=training_list, value=training_val)
 						refresh_configs = gr.Button(value="Refresh Configurations")
 						training_output = gr.TextArea(label="Console Output", interactive=False, max_lines=8)
 						verbose_training = gr.Checkbox(label="Verbose Console Output", value=True)
