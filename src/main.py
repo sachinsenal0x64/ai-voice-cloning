@@ -11,6 +11,9 @@ os.environ['PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION'] = 'python'
 from utils import *
 from webui import *
 
+from api.websocket_server import start_websocket_server
+
+
 if __name__ == "__main__":
 	args = setup_args()
 
@@ -23,6 +26,7 @@ if __name__ == "__main__":
 		if not args.defer_tts_load:
 			tts = load_tts()
 
+		start_websocket_server('127.0.0.1', 8069)
 		webui.block_thread()
 elif __name__ == "main":
 	from fastapi import FastAPI
@@ -38,3 +42,4 @@ elif __name__ == "main":
 
 	if not args.defer_tts_load:
 		tts = load_tts()
+
