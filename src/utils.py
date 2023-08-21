@@ -3052,14 +3052,23 @@ def import_voices(files, saveAs=None, progress=None):
 def relative_paths( dirs ):
 	return [ './' + os.path.relpath( d ).replace("\\", "/") for d in dirs ]
 
-def get_voice( name, dir=get_voice_dir(), load_latents=True ):
+def get_voice( name, dir=get_voice_dir(), load_latents=True, extensions=["wav", "mp3", "flac"] ):
 	subj = f'{dir}/{name}/'
 	if not os.path.isdir(subj):
 		return
-
-	voice = list(glob(f'{subj}/*.wav')) + list(glob(f'{subj}/*.mp3')) + list(glob(f'{subj}/*.flac'))
+	files = os.listdir(subj)
+	
 	if load_latents:
-		voice = voice + list(glob(f'{subj}/*.pth'))
+		extensions.append("pth")
+
+	voice = []
+	for file in files:
+		ext = os.path.splitext(file)[-1][1:]
+		if ext not in extensions:
+			continue
+
+		voice.append(f'{subj}/{file}')
+
 	return sorted( voice )
 
 def get_voice_list(dir=get_voice_dir(), append_defaults=False, extensions=["wav", "mp3", "flac", "pth"]):
