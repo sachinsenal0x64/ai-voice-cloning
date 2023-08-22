@@ -9,8 +9,10 @@ from utils import generate, get_autoregressive_models, get_voice_list
 
 # this is a not so nice workaround to set values to None if their string value is "None"
 def replaceNoneStringWithNone(message):
+    ignore_fields = ['text']  # list of fields which CAN have "None" as literal String value
+
     for member in message:
-        if message[member] == 'None':
+        if message[member] == 'None' and member not in ignore_fields:
             message[member] = None
 
     return message
