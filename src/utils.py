@@ -2359,7 +2359,8 @@ def slice_dataset( voice, trim_silence=True, start_offset=0, end_offset=0, resul
 				print(message)
 				messages.append(message)
 				continue
-		#	sliced, _ = resample( sliced, sample_rate, TARGET_SAMPLE_RATE )
+		
+			sliced, _ = resample( sliced, sample_rate, TARGET_SAMPLE_RATE )
 
 			if waveform.shape[0] == 2:
 				waveform = waveform[:1]
@@ -3067,7 +3068,7 @@ def get_voice( name, dir=get_voice_dir(), load_latents=True, extensions=["wav", 
 		if ext not in extensions:
 			continue
 
-		voice.append(f'{subj}/{file}')
+		voice.append(f'{subj}/{file}') 
 
 	return sorted( voice )
 
