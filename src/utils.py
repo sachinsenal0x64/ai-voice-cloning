@@ -2662,7 +2662,8 @@ def prepare_dataset( voice, use_segments=False, text_length=0, audio_length=0, p
 		if culled or args.tts_backend != "vall-e":
 			continue
 		
-		os.makedirs(f'{indir}/valle/', exist_ok=True)
+		# os.makedirs(f'{indir}/valle/', exist_ok=True)
+		os.makedirs(f'./training/valle/data/{voice}/', exist_ok=True)
 
 		#phn_file = f'{indir}/valle/{file.replace(f".{extension}",".phn.txt")}'
 		phn_file = f'./training/valle/data/{voice}/{file.replace(f".{extension}",".phn.txt")}'
