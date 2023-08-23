@@ -2535,7 +2535,7 @@ def prepare_dataset( voice, use_segments=False, text_length=0, audio_length=0, p
 
 			duration = 0
 			for segment in result['segments']:
-				duration = max(duration, result['segments'][segment]['end'])
+				duration = max(duration, segment['end'])
 
 			if duration >= MAX_TRAINING_DURATION:
 				message = f"Audio too large, using segments: {filename}"
