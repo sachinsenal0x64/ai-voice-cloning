@@ -411,7 +411,7 @@ def setup_gradio():
 					GENERATE_SETTINGS["num_autoregressive_samples"] = gr.Slider(value=16, minimum=2, maximum=2048 if args.tts_backend=="vall-e" else 512, step=1, label="Samples", visible=args.tts_backend!="bark")
 					GENERATE_SETTINGS["diffusion_iterations"] = gr.Slider(value=30, minimum=0, maximum=512, step=1, label="Iterations", visible=args.tts_backend=="tortoise")
 
-					GENERATE_SETTINGS["temperature"] = gr.Slider(value=0.95 if args.tts_backend=="vall-e" else 0.2, minimum=0, maximum=1, step=0.1, label="Temperature")
+					GENERATE_SETTINGS["temperature"] = gr.Slider(value=0.95 if args.tts_backend=="vall-e" else 0.2, minimum=0, maximum=1, step=0.05, label="Temperature")
 					
 					show_experimental_settings = gr.Checkbox(label="Show Experimental Settings", visible=args.tts_backend=="tortoise")
 					reset_generate_settings_button = gr.Button(value="Reset to Default")

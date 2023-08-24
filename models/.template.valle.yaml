@@ -23,7 +23,7 @@ dataset:
   max_prompts: 3
   prompt_duration: 3.0
 
-  sample_type: speaker
+  sample_type: path
 
   tasks_list: ["tts"] # ["tts", "ns", "sr", "tse", "cse", "nse", "tts"]
 
