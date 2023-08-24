@@ -1099,7 +1099,7 @@ def generate_tortoise(**kwargs):
 	for i, file in enumerate(os.listdir(outdir)):
 		filename = os.path.basename(file)
 		extension = os.path.splitext(filename)[-1][1:]
-		if extension != ".json" and extension != ".wav":
+		if extension != "json" and extension != "wav":
 			continue
 		match = re.findall(rf"^{voice}_(\d+)(?:.+?)?{extension}$", filename)
 		if match and len(match) > 0:
