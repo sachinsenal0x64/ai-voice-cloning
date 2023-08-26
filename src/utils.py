@@ -2475,6 +2475,9 @@ def phonemizer( text, language="en-us" ):
 	tokenized = " ".join( tokens )
 
 def should_phonemize():
+	if args.tts_backend == "vall-e":
+		return False
+		
 	should = args.tokenizer_json is not None and args.tokenizer_json[-8:] == "ipa.json"
 	if should:
 		try:
