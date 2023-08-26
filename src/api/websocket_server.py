@@ -4,7 +4,7 @@ from threading import Thread
 
 from websockets.server import serve
 
-from utils import generate, get_autoregressive_models, get_voice_list, args, update_autoregressive_model, update_diffusion_model, update_tokenizer
+from utils import generate, get_autoregressive_models, get_voice_list, args, update_autoregressive_model, update_diffusion_model, update_tokenizer, tts
 
 # this is a not so nice workaround to set values to None if their string value is "None"
 def replaceNoneStringWithNone(message):
@@ -70,7 +70,7 @@ async def _handle_connection(websocket, path):
 
 
 async def _run(host: str, port: int):
-    print("websocket: server started")
+    print(f"websocket: server started on ws://{host}:{port}")
 
     async with serve(_handle_connection, host, port, ping_interval=None):
         await asyncio.Future()  # run forever
