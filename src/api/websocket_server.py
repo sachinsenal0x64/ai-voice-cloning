@@ -4,7 +4,7 @@ from threading import Thread
 
 from websockets.server import serve
 
-from utils import generate, get_autoregressive_models, get_voice_list, args, update_autoregressive_model, update_diffusion_model, update_tokenizer, tts
+from utils import generate, get_autoregressive_models, get_voice_list, args, update_autoregressive_model, update_diffusion_model, update_tokenizer
 
 # this is a not so nice workaround to set values to None if their string value is "None"
 def replaceNoneStringWithNone(message):
