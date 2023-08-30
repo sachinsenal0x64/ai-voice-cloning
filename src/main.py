@@ -26,7 +26,9 @@ if __name__ == "__main__":
 		if not args.defer_tts_load:
 			tts = load_tts()
 
-		start_websocket_server('127.0.0.1', 8069)
+		if args.websocket_enabled:
+			start_websocket_server(args.websocket_listen_address, args.websocket_listen_port)
+
 		webui.block_thread()
 elif __name__ == "main":
 	from fastapi import FastAPI

@@ -3303,6 +3303,10 @@ def setup_args(cli=False):
 
 		'training-default-halfp': False,
 		'training-default-bnb': True,
+
+		'websocket-listen-address': "127.0.0.1",
+		'websocket-listen-port': 8069,
+		'websocket-enabled': False
 	}
 
 	if os.path.isfile('./config/exec.json'):
@@ -3355,6 +3359,10 @@ def setup_args(cli=False):
 	
 	parser.add_argument("--training-default-halfp", action='store_true', default=default_arguments['training-default-halfp'], help="Training default: halfp")
 	parser.add_argument("--training-default-bnb", action='store_true', default=default_arguments['training-default-bnb'], help="Training default: bnb")
+
+	parser.add_argument("--websocket-listen-port", type=int, default=default_arguments['websocket-listen-port'], help="Websocket server listen port, default: 8069")
+	parser.add_argument("--websocket-listen-address", default=default_arguments['websocket-listen-address'], help="Websocket server listen address, default: 127.0.0.1")
+	parser.add_argument("--websocket-enabled", action='store_true', default=default_arguments['websocket-enabled'], help="Websocket API server enabled, default: false")
 	
 	parser.add_argument("--os", default="unix", help="Specifies which OS, easily")
 	if cli:
