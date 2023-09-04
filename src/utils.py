@@ -3272,7 +3272,7 @@ def setup_args(cli=False):
 		'embed-output-metadata': True,
 		'latents-lean-and-mean': True,
 		'voice-fixer': False, # getting tired of long initialization times in a Colab for downloading a large dataset for it
-		'use-deepspeed': True,
+		'use-deepspeed': False,
 		'voice-fixer-use-cuda': True,
 
 		
