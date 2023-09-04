@@ -3272,6 +3272,7 @@ def setup_args(cli=False):
 		'embed-output-metadata': True,
 		'latents-lean-and-mean': True,
 		'voice-fixer': False, # getting tired of long initialization times in a Colab for downloading a large dataset for it
+		'use-deepspeed': True,
 		'voice-fixer-use-cuda': True,
 
 		
@@ -3330,6 +3331,7 @@ def setup_args(cli=False):
 	parser.add_argument("--latents-lean-and-mean", action='store_true', default=default_arguments['latents-lean-and-mean'], help="Exports the bare essentials for latents.")
 	parser.add_argument("--voice-fixer", action='store_true', default=default_arguments['voice-fixer'], help="Uses python module 'voicefixer' to improve audio quality, if available.")
 	parser.add_argument("--voice-fixer-use-cuda", action='store_true', default=default_arguments['voice-fixer-use-cuda'], help="Hints to voicefixer to use CUDA, if available.")
+	parser.add_argument("--use-deepspeed", action='store_true', default=default_arguments['use-deepspeed'], help="Use deepspeed for speed bump.")
 	parser.add_argument("--force-cpu-for-conditioning-latents", default=default_arguments['force-cpu-for-conditioning-latents'], action='store_true', help="Forces computing conditional latents to be done on the CPU (if you constantyl OOM on low chunk counts)")
 	parser.add_argument("--defer-tts-load", default=default_arguments['defer-tts-load'], action='store_true', help="Defers loading TTS model")
 	parser.add_argument("--prune-nonfinal-outputs", default=default_arguments['prune-nonfinal-outputs'], action='store_true', help="Deletes non-final output files on completing a generation")
@@ -3414,6 +3416,7 @@ def get_default_settings( hypenated=True ):
 		'embed-output-metadata': args.embed_output_metadata,
 		'latents-lean-and-mean': args.latents_lean_and_mean,
 		'voice-fixer': args.voice_fixer,
+		'use-deepspeed': args.use_deepspeed,
 		'voice-fixer-use-cuda': args.voice_fixer_use_cuda,
 		'concurrency-count': args.concurrency_count,
 		'output-sample-rate': args.output_sample_rate,
@@ -3467,6 +3470,7 @@ def update_args( **kwargs ):
 	args.latents_lean_and_mean = settings['latents_lean_and_mean']
 	args.voice_fixer = settings['voice_fixer']
 	args.voice_fixer_use_cuda = settings['voice_fixer_use_cuda']
+	args.use_deepspeed = settings['use_deepspeed']
 	args.concurrency_count = settings['concurrency_count']
 	args.output_sample_rate = 44000
 	args.autocalculate_voice_chunk_duration_size = settings['autocalculate_voice_chunk_duration_size']
@@ -3639,7 +3643,7 @@ def load_tts( restart=False,
 			print("!!!! WARNING !!!! No GPU available in PyTorch. You may need to reinstall PyTorch.")
 
 		print(f"Loading TorToiSe... (AR: {autoregressive_model}, diffusion: {diffusion_model}, vocoder: {vocoder_model})")
-		tts = TorToise_TTS(minor_optimizations=not args.low_vram, autoregressive_model_path=autoregressive_model, diffusion_model_path=diffusion_model, vocoder_model=vocoder_model, tokenizer_json=tokenizer_json, unsqueeze_sample_batches=args.unsqueeze_sample_batches)
+		tts = TorToise_TTS(minor_optimizations=not args.low_vram, autoregressive_model_path=autoregressive_model, diffusion_model_path=diffusion_model, vocoder_model=vocoder_model, tokenizer_json=tokenizer_json, unsqueeze_sample_batches=args.unsqueeze_sample_batches, use_deepspeed=args.use_deepspeed)
 	elif args.tts_backend == "vall-e":
 		if valle_model:
 			args.valle_model = valle_model
