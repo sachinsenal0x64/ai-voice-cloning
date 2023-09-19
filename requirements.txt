@@ -9,3 +9,4 @@ psutil
 phonemizer
 pydantic==1.10.11
 websockets
+beartype==0.15.0
