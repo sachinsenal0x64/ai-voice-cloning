@@ -2665,8 +2665,8 @@ def prepare_dataset( voice, use_segments=False, text_length=0, audio_length=0, p
 
 
 		culled = len(text) < text_length
-		#if not culled and audio_length > 0:
-		#	culled = duration < audio_length
+		if not culled and audio_length > 0:
+			culled = duration < audio_length
 
 		line = f'audio/{file}|{phonemes if phonemize and phonemes else text}'
 
