@@ -68,7 +68,19 @@ BARK_ENABLED = False
 
 VERBOSE_DEBUG = True
 
+KKS = None
+PYKAKASI_ENABLED = False
+
 import traceback
+
+try:
+	import pykakasi
+	KKS = pykakasi.kakasi()
+	PYKAKASI_ENABLED = True
+except Exception as e:
+	#if VERBOSE_DEBUG:
+	#	print(traceback.format_exc())
+	pass
 
 try:
 	from whisper.normalizers.english import EnglishTextNormalizer
@@ -2733,6 +2745,14 @@ def prepare_dataset( voice, use_segments=False, text_length=0, audio_length=0, p
 	for i in tqdm(range(len(jobs['phonemize'][0])), desc="Phonemizing"):
 		phn_file = jobs['phonemize'][0][i]
 		normalized = jobs['phonemize'][1][i]
+
+		if language == "japanese":
+			language = "ja"
+
+		if language == "ja" and PYKAKASI_ENABLED and KKS is not None:
+			normalized = KKS.convert(normalized)
+			normalized = [ n["hira"] for n in normalized ]
+			normalized = "".join(normalized)
 
 		try:
 			phonemized = valle_phonemize( normalized )

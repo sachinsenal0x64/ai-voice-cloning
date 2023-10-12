@@ -20,7 +20,7 @@ ENV PATH="$HOME/miniconda/bin:$PATH"
 RUN conda init
 RUN conda install python=$PYTHON_VERSION
 RUN python3 -m pip install --upgrade pip
-RUN pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu118
+RUN pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 
 RUN mkdir $HOME/ai-voice-cloning
 WORKDIR $HOME/ai-voice-cloning
