@@ -1182,11 +1182,14 @@ def generate_tortoise(**kwargs):
 			latents_path = f'{dir}/cond_latents_{model_hash}.pth'
 
 			if voice == "random" or voice == "microphone":
-				# if latents and settings is not None and settings['conditioning_latents']:
-				if latents and settings is not None and torch.any(settings['conditioning_latents']):
-
-					os.makedirs(dir, exist_ok=True)
-					torch.save(conditioning_latents, latents_path)
+				if args.use_hifigan:
+					if latents and settings is not None and torch.any(settings['conditioning_latents']):
+						os.makedirs(dir, exist_ok=True)
+						torch.save(conditioning_latents, latents_path)
+				else: 
+					if latents and settings is not None and settings['conditioning_latents']:
+						os.makedirs(dir, exist_ok=True)
+						torch.save(conditioning_latents, latents_path)
 
 			if latents_path and os.path.exists(latents_path):
 				try:
