@@ -38,6 +38,7 @@ from datetime import datetime
 from datetime import timedelta
 
 from tortoise.api import TextToSpeech as TorToise_TTS, MODELS, get_model_path, pad_or_truncate
+from tortoise.api_fast import TextToSpeech as Toroise_TTS_Hifi
 from tortoise.utils.audio import load_audio, load_voice, load_voices, get_voice_dir, get_voices
 from tortoise.utils.text import split_and_recombine_text
 from tortoise.utils.device import get_device_name, set_device_name, get_device_count, get_device_vram, get_device_batch_size, do_gc
@@ -1073,10 +1074,11 @@ def generate_tortoise(**kwargs):
 				settings['autoregressive_model'] = deduce_autoregressive_model(selected_voice)
 			tts.load_autoregressive_model(settings['autoregressive_model'])
 
-		if settings['diffusion_model'] is not None:
-			if settings['diffusion_model'] == "auto":
-				settings['diffusion_model'] = deduce_diffusion_model(selected_voice)
-			tts.load_diffusion_model(settings['diffusion_model'])
+		if not args.use_hifigan:
+			if settings['diffusion_model'] is not None:
+				if settings['diffusion_model'] == "auto":
+					settings['diffusion_model'] = deduce_diffusion_model(selected_voice)
+				tts.load_diffusion_model(settings['diffusion_model'])
 		
 		if settings['tokenizer_json'] is not None:
 			tts.load_tokenizer_json(settings['tokenizer_json'])
@@ -1180,7 +1182,9 @@ def generate_tortoise(**kwargs):
 			latents_path = f'{dir}/cond_latents_{model_hash}.pth'
 
 			if voice == "random" or voice == "microphone":
-				if latents and settings is not None and settings['conditioning_latents']:
+				# if latents and settings is not None and settings['conditioning_latents']:
+				if latents and settings is not None and torch.any(settings['conditioning_latents']):
+
 					os.makedirs(dir, exist_ok=True)
 					torch.save(conditioning_latents, latents_path)
 
@@ -1220,9 +1224,16 @@ def generate_tortoise(**kwargs):
 				raise Exception("Prompt settings editing requested, but received invalid JSON")
 
 		settings = get_settings( override=override )
-		gen, additionals = tts.tts(cut_text, **settings )
-
-		parameters['seed'] = additionals[0]
+		print(settings)
+		try:
+			if args.use_hifigan:
+				gen = tts.tts(cut_text, **settings)
+			else:
+				gen, additionals = tts.tts(cut_text, **settings )
+				parameters['seed'] = additionals[0]
+		except Exception as e:
+			raise RuntimeError(f'Possible latent mismatch: click the "(Re)Compute Voice Latents" button and then try again. Error: {e}')
+		
 		run_time = time.time()-start_time
 		print(f"Generating line took {run_time} seconds")
 
@@ -3293,6 +3304,7 @@ def setup_args(cli=False):
 		'latents-lean-and-mean': True,
 		'voice-fixer': False, # getting tired of long initialization times in a Colab for downloading a large dataset for it
 		'use-deepspeed': False,
+		'use-hifigan': False,
 		'voice-fixer-use-cuda': True,
 
 		
@@ -3352,6 +3364,8 @@ def setup_args(cli=False):
 	parser.add_argument("--voice-fixer", action='store_true', default=default_arguments['voice-fixer'], help="Uses python module 'voicefixer' to improve audio quality, if available.")
 	parser.add_argument("--voice-fixer-use-cuda", action='store_true', default=default_arguments['voice-fixer-use-cuda'], help="Hints to voicefixer to use CUDA, if available.")
 	parser.add_argument("--use-deepspeed", action='store_true', default=default_arguments['use-deepspeed'], help="Use deepspeed for speed bump.")
+	parser.add_argument("--use-hifigan", action='store_true', default=default_arguments['use-hifigan'], help="Use Hifigan instead of Diffusion")
+
 	parser.add_argument("--force-cpu-for-conditioning-latents", default=default_arguments['force-cpu-for-conditioning-latents'], action='store_true', help="Forces computing conditional latents to be done on the CPU (if you constantyl OOM on low chunk counts)")
 	parser.add_argument("--defer-tts-load", default=default_arguments['defer-tts-load'], action='store_true', help="Defers loading TTS model")
 	parser.add_argument("--prune-nonfinal-outputs", default=default_arguments['prune-nonfinal-outputs'], action='store_true', help="Deletes non-final output files on completing a generation")
@@ -3437,6 +3451,7 @@ def get_default_settings( hypenated=True ):
 		'latents-lean-and-mean': args.latents_lean_and_mean,
 		'voice-fixer': args.voice_fixer,
 		'use-deepspeed': args.use_deepspeed,
+		'use-hifigan': args.use_hifigan,
 		'voice-fixer-use-cuda': args.voice_fixer_use_cuda,
 		'concurrency-count': args.concurrency_count,
 		'output-sample-rate': args.output_sample_rate,
@@ -3491,6 +3506,7 @@ def update_args( **kwargs ):
 	args.voice_fixer = settings['voice_fixer']
 	args.voice_fixer_use_cuda = settings['voice_fixer_use_cuda']
 	args.use_deepspeed = settings['use_deepspeed']
+	args.use_hifigan = settings['use_hifigan']
 	args.concurrency_count = settings['concurrency_count']
 	args.output_sample_rate = 44000
 	args.autocalculate_voice_chunk_duration_size = settings['autocalculate_voice_chunk_duration_size']
@@ -3662,8 +3678,22 @@ def load_tts( restart=False,
 		if get_device_name() == "cpu":
 			print("!!!! WARNING !!!! No GPU available in PyTorch. You may need to reinstall PyTorch.")
 
-		print(f"Loading TorToiSe... (AR: {autoregressive_model}, diffusion: {diffusion_model}, vocoder: {vocoder_model})")
-		tts = TorToise_TTS(minor_optimizations=not args.low_vram, autoregressive_model_path=autoregressive_model, diffusion_model_path=diffusion_model, vocoder_model=vocoder_model, tokenizer_json=tokenizer_json, unsqueeze_sample_batches=args.unsqueeze_sample_batches, use_deepspeed=args.use_deepspeed)
+		
+		if args.use_hifigan:
+			print("Loading Tortoise with Hifigan")
+			tts = Toroise_TTS_Hifi(autoregressive_model_path=autoregressive_model,  
+							tokenizer_json=tokenizer_json, 
+							use_deepspeed=args.use_deepspeed)
+		else:
+			print(f"Loading TorToiSe... (AR: {autoregressive_model}, diffusion: {diffusion_model}, vocoder: {vocoder_model})")
+			tts = TorToise_TTS(minor_optimizations=not args.low_vram, 
+							autoregressive_model_path=autoregressive_model, 
+							diffusion_model_path=diffusion_model, 
+							vocoder_model=vocoder_model, 
+							tokenizer_json=tokenizer_json, 
+							unsqueeze_sample_batches=args.unsqueeze_sample_batches, 
+							use_deepspeed=args.use_deepspeed)
+			
 	elif args.tts_backend == "vall-e":
 		if valle_model:
 			args.valle_model = valle_model
