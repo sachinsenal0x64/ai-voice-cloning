@@ -1,6 +1,6 @@
 # AI Voice Cloning
 
-> **Note** This project has been in dire need of being rewritten from the ground up for some time. Apologies for any crust from my rather spaghetti code.
+> **Note** This project is effectively abandonware due to requiring a rewrite. Please use [JarodMica/ai-voice-cloning](https://github.com/JarodMica/ai-voice-cloning).
 
 This [repo](https://git.ecker.tech/mrq/ai-voice-cloning)/[rentry](https://rentry.org/AI-Voice-Cloning/) aims to serve as both a foolproof guide for setting up AI voice cloning tools for legitimate, local use on Windows/Linux, as well as a stepping stone for anons that genuinely want to play around with [TorToiSe](https://github.com/neonbjb/tortoise-tts).
 
